@@ -2,7 +2,7 @@
 
 # pystack
 
-It's a debug tool to print python threads or greenlet stacks.
+A debug tool to print python threads or greenlet stacks.
 
 fork of [pystack](https://pypi.org/project/pystack-debugger/).
 
