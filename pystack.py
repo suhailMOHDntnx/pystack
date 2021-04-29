@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from __future__ import absolute_import, print_function
 
 import os
@@ -12,7 +10,6 @@ import codecs
 import locale
 import distutils.spawn
 
-import click
 
 
 FILE_OPEN_COMMAND = r'f = open(\"%s\", \"w\")'
@@ -22,13 +19,10 @@ UTILITY_COMMANDS = [
     r'itervalues = lambda d:getattr(d, \"itervalues\", d.values)()',
 ]
 
+# Only works on latest gevent versions (>1.3)
 GREENLET_STACK_COMMANDS = [
-    r'import gc,greenlet,traceback',
-    r'objs=[ob for ob in gc.get_objects() if '
-    r'isinstance(ob,greenlet.greenlet) if ob]',
-    r'f.write(\"\\nDumping Greenlets....\\n\\n\\n\")',
-    r'f.write(\"\\n---------------\\n\\n\".join('
-    r'\"\".join(traceback.format_stack(o.gr_frame)) for o in objs))',
+    r'from gevent.util import format_run_info',
+    r'f.write(\'\\n\'.join(format_run_info()))'
 ]
 
 THREAD_STACK_COMMANDS = [
@@ -120,24 +114,15 @@ CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
 
-
-@click.command(context_settings=CONTEXT_SETTINGS)
-@click.argument('pid', required=True, type=int)
-@click.option('--include-greenlet', default=False, is_flag=True,
-              help="Also print greenlet stacks")
-@click.option('-d', '--debugger', type=click.Choice(['gdb', 'lldb']))
-@click.option('-v', '--verbose', default=False, is_flag=True,
-              help="Verbosely print error and warnings")
-def cli_main(pid, include_greenlet, debugger, verbose):
+def cli_main(pid, include_greenlet=True, debugger='gdb', verbose=True):
     '''Print stack of python process.
-
     $ pystack <pid>
     '''
     try:
         print_stack(pid, include_greenlet, debugger, verbose)
     except DebuggerNotFound as e:
-        click.echo('DebuggerNotFound: %s' % e.args[0], err=True)
-        click.get_current_context().exit(1)
+        print('DebuggerNotFound: %s' % e.args[0])
+        sys.exit(1)
 
 
 def tolerate_missing_locale():
@@ -152,7 +137,7 @@ def tolerate_missing_locale():
 
 def main():
     tolerate_missing_locale()
-    cli_main()
+    cli_main(sys.argv[1])
 
 
 if __name__ == '__main__':
