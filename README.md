@@ -2,30 +2,21 @@
 
 # pystack
 
-The pystack is to python as jstack is to java.
-
 It's a debug tool to print python threads or greenlet stacks.
 
-Idea stolen from [pyrasite](https://github.com/lmacken/pyrasite).
+fork of [pystack](https://pypi.org/project/pystack-debugger/).
 
-## Install
+deviations from original:
+- works without click
+- no pip install required, suitable for simply copying the script onto the cluster and executing
+- leverages `format_run_info` provided by latest version of gevents for dumping greenlet info
 
-    $ pip install pystack-debugger
 
 ## Usage
 
-You may need to run it with `sudo`.
+Copy `pystack.py` onto your machine.
 
-    $ sudo pystack [--include-greenlet] <pid>
+Then:
 
-## Compatibility
+    $ sudo python pystack <pid>
 
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pystack-debugger.svg)](https://pypi.org/project/pystack-debugger/)
-[![PyPI - Implementation](https://img.shields.io/pypi/implementation/pystack-debugger.svg)](https://pypi.org/project/pystack-debugger/)
-
-The pystack is compatible with CPython 2.7+ and CPython 3.6+ in both client
-(the debugger) and server (the destination process).
-
-Using PyPy may work in client (the debugger) but it is untested. Do not attempt
-to attach a PyPI process as destination since the pystack debugger uses gdb/lldb
-to invoke the CPython ABI.
